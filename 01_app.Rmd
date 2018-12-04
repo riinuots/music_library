@@ -1,0 +1,53 @@
+---
+title: "Riinu’s Music Library"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(googledrive)
+library(readxl)
+library()
+
+# "1akfkTQTlFVIHT7o4QLLhSsF1V5WX3IjodjhhOq1jdG4" %>%
+#   drive_get(id = .) %>%
+#   drive_download(path = "mylibrary.csv", overwrite = TRUE)
+
+mylibrary = read_csv("mylibrary.csv")
+
+```
+
+
+
+```{r}
+
+all_instrumentation = mylibrary$instrumentation %>% unique()
+all_instrumentation = all_instrumentation[order(all_instrumentation)]
+
+all_genre = mylibrary$genre %>% unique()
+all_genre = all_genre[order(all_genre)]
+
+checkboxGroupInput("instrumentation",
+                   label = "Instrumentation:",
+                   choices = all_instrumentation,
+                   selected = c("violin-piano", "violin-viola-cello-piano"),
+                   inline = TRUE)
+
+checkboxGroupInput("genre",
+                   label = "Genre:",
+                   choices = all_genre,
+                   selected = "christmas",
+                   inline = TRUE)
+
+DT::renderDataTable({
+  
+  mylibrary %>% 
+    filter(instrumentation %in% input$instrumentation) %>% 
+    filter(genre %in% input$genre) %>% 
+    DT::datatable(options = list(pageLength = 100), rownames = FALSE)
+  
+})
+```
+
